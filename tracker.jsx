@@ -206,7 +206,7 @@ const Card = ({ children, style = {} }) => (
 
 // ─── MAIN APP ───────────────────────────────────────────────
 export default function SpeakersGymTracker() {
-  const stored = loadData();
+  const [stored] = useState(loadData);
   const [studentName, setStudentName] = useState(stored?.studentName || "");
   const [cohortDate, setCohortDate] = useState(stored?.cohortDate || "");
   const [weeks, setWeeks] = useState(stored?.weeks || WEEKS.map(() => emptyWeek()));
@@ -415,21 +415,14 @@ export default function SpeakersGymTracker() {
           <button
             onClick={() => {
               if (window.confirm("Reset all data? This will clear all scores, notes, and student info. This cannot be undone.")) {
-                const freshWeeks = [0,1,2,3,4,5].map(() => ({
-                  vocal: [0, 0, 0, 0, 0],
-                  body: [0, 0, 0, 0, 0],
-                  structure: [0, 0, 0, 0, 0],
-                  anxiety: 5,
-                  confidence: 5,
-                  notes: { well: "", improve: "", focus: "" },
-                }));
-                setWeeks(freshWeeks);
+                try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+                setWeeks(WEEKS.map(() => emptyWeek()));
                 setStudentName("");
                 setCohortDate("");
                 setActiveWeek(0);
                 setView("input");
+                setShowExport(false);
                 setResetKey(k => k + 1);
-                try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
               }
             }}
             style={{
